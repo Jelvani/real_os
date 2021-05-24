@@ -2,7 +2,7 @@
 print_string:
     pusha ;push all registers to stack
     mov ah, 0xe ;TELETYPE OUTPUT
-    mov bl, 0xd
+    mov bl, 0x0 ;foreground color for graphics mode
 
     .loop:
         lodsb ;loads byte from SI into AL, and increments SI
