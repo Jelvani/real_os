@@ -5,7 +5,7 @@ OBJCOPY = objcopy
 BOOTLOADER_NAME = bootloader
 KERNEL_NAME = real_os
 DD = dd
-CFLAGS = -Os -m16 -ffreestanding -nostartfiles -nostdlib \
+CFLAGS = -Os -m16 -masm=intel -ffreestanding -nostartfiles -nostdlib \
 	-Wall -Werror 
 LDFLAGS = -melf_i386
 
@@ -18,7 +18,7 @@ $(BOOTLOADER_NAME).bin: $(BOOTLOADER_NAME).asm
 	$(AS) -Werror -f bin $< -o $@
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@ 
 
 $(KERNEL_NAME).elf: test.o
 	$(LD) $(LDFLAGS) -Tlink.ld $^ -o $@
