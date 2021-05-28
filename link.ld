@@ -1,5 +1,5 @@
 OUTPUT_FORMAT("elf32-i386");
-ENTRY(main);
+ENTRY(kmain);
 SECTIONS
 {
     . = 0x0;

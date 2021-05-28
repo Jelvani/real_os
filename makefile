@@ -9,32 +9,34 @@ CFLAGS = -Os -m16 -masm=intel -ffreestanding -nostartfiles -nostdlib \
 	-Wall -Werror 
 LDFLAGS = -melf_i386
 
-OBJS= $(wildcard *.o)
+DIR_SRC=src
+DIR_BIN=bin
+DIR_BUILD=build
 
-all: $(KERNEL_NAME).img
+OBJS= $(DIR_SRC)/test.o
+
+all: $(DIR_BUILD)/$(KERNEL_NAME).img
 	qemu-system-x86_64.exe -fda $<
 
-$(BOOTLOADER_NAME).bin: $(BOOTLOADER_NAME).asm
+$(DIR_BIN)/$(BOOTLOADER_NAME).bin: $(DIR_SRC)/$(BOOTLOADER_NAME).asm
 	$(AS) -Werror -f bin $< -o $@
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@ 
 
-$(KERNEL_NAME).elf: test.o
+$(DIR_BIN)/$(KERNEL_NAME).elf: $(OBJS)
 	$(LD) $(LDFLAGS) -Tlink.ld $^ -o $@
 
-$(KERNEL_NAME).bin: $(KERNEL_NAME).elf
+$(DIR_BIN)/$(KERNEL_NAME).bin: $(DIR_BIN)/$(KERNEL_NAME).elf
 	$(OBJCOPY) -O binary $< $@
 
-$(KERNEL_NAME).img: $(BOOTLOADER_NAME).bin $(KERNEL_NAME).bin
+$(DIR_BUILD)/$(KERNEL_NAME).img: $(DIR_BIN)/$(BOOTLOADER_NAME).bin $(DIR_BIN)/$(KERNEL_NAME).bin
 	$(DD) if=/dev/zero of=$@ bs=1024 count=1440
-	$(DD) if=$(BOOTLOADER_NAME).bin of=$@ conv=notrunc
-	$(DD) if=$(KERNEL_NAME).bin of=$@ conv=notrunc seek=1
+	$(DD) if=$(DIR_BIN)/$(BOOTLOADER_NAME).bin of=$@ conv=notrunc
+	$(DD) if=$(DIR_BIN)/$(KERNEL_NAME).bin of=$@ conv=notrunc seek=1
 
 clean:
-	rm -f *.o
-	rm -f *.img
-	rm -f *.elf
-	rm -f *.bin
-#c_code: test.c
-#	gcc -c -Os -m16 -march=i686 test.c -o test.0
+	rm -f src/*.o
+	rm -f build/*.img
+	rm -f bin/*.elf
+	rm -f bin/*.bin
